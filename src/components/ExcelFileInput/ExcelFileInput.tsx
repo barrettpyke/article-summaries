@@ -2,9 +2,10 @@
 
 import { DragEvent, Ref, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
+import { headersValid } from './headersValid';
 
 interface ExcelFileInputProps {
-  onFileUpload: (json: string[]) => void;
+  onFileUpload: (json: string[][]) => void;
 }
 
 const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
@@ -67,7 +68,13 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
       const workbook = XLSX.read(data, { type: 'array' });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const jsonData: string[] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      const jsonData: string[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+      if (!headersValid(jsonData[0])) {
+        setError(
+          'Invalid headers, please set the following headers in the first row, in this order: article, authorName, metadata',
+        );
+      }
 
       if (onFileUpload) {
         onFileUpload(jsonData);
@@ -78,11 +85,12 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col justify-center items-center">
+      {error && <div className="text-red-500 mt-10">{error}</div>}
       <div
         onDragOver={onDragOver}
         onDrop={onDrop}
-        className="border-2 border-dashed border-gray pa-20 text-center cursor-pointer"
+        className="h-75 w-150 mt-10 border-2 border-dashed border-gray-300 rounded-md pa-20 text-center bg-gray-100"
       >
         <input
           type="file"
@@ -91,16 +99,22 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
           ref={fileInputRef}
           className="hidden"
         />
-        {file ? (
-          <div>Selected file: {file.name}</div>
+        {file && !error ? (
+          <div className="mt-10">
+            Selected file: <span className="font-bold">{file.name}</span>
+          </div>
         ) : (
           <>
-            <div>Drag and drop a .xlsx or .xls file here.</div>
-            <button onClick={onClick}>Select file</button>
+            <div className="font-bold mt-10">Drag and drop a file here</div>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer mt-10"
+              onClick={onClick}
+            >
+              Select file
+            </button>
           </>
         )}
       </div>
-      {error && <div className="text-red">{error}</div>}
     </div>
   );
 };
