@@ -1,6 +1,9 @@
 const EXPECTED_HEADERS = ['article', 'authorName', 'metadata'];
 
-export const headersValid = (headers: string[]) => {
+// leave this as a generic object so we can test if invalid headers return false
+export const headersValid = (row: object) => {
+  const headers = Object.keys(row);
+
   if (headers.length !== EXPECTED_HEADERS.length) {
     return false;
   }

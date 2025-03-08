@@ -3,14 +3,16 @@
 import { DragEvent, Ref, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { headersValid } from './headersValid';
+import { Row } from '@/types';
+import LoadingSpinner from '../LoadingSpinner';
 
 interface ExcelFileInputProps {
-  onFileUpload: (json: string[][]) => void;
+  onFileUpload: (json: Row[]) => void;
 }
 
 const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
-  const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const fileInputRef: Ref<HTMLInputElement> = useRef(null);
 
   const onDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -53,11 +55,10 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
         selectedFile.type === 'application/vnd.ms-excel'
       ) {
-        setFile(selectedFile);
+        setIsLoading(true);
         processExcel(selectedFile);
       } else {
         setError('Please upload an Excel file.');
-        setFile(null);
       }
     }
   };
@@ -68,7 +69,8 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
       const workbook = XLSX.read(data, { type: 'array' });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const jsonData: string[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      const jsonData: Row[] = XLSX.utils.sheet_to_json(worksheet);
+      console.log(jsonData);
 
       if (!headersValid(jsonData[0])) {
         setError(
@@ -82,6 +84,7 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
     } catch (err) {
       setError(`Error processing file: ${err}`);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -99,9 +102,12 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
           ref={fileInputRef}
           className="hidden"
         />
-        {file && !error ? (
+        {isLoading ? (
           <div className="mt-10">
-            Selected file: <span className="font-bold">{file.name}</span>
+            Processing...
+            <div className="flex justify-center mr-2 mt-5">
+              <LoadingSpinner />
+            </div>
           </div>
         ) : (
           <>

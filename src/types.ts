@@ -1,1 +1,5 @@
-export type Headers = 'article' | 'authorName' | 'metadata';
+export type Row = {
+  article: string;
+  authorName: string;
+  metadata: string;
+};

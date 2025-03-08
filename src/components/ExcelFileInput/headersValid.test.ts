@@ -2,22 +2,39 @@ import { headersValid } from './headersValid';
 
 describe('headersValid', () => {
   it('should return true for valid headers', () => {
-    const validHeaders = ['article', 'authorName', 'metadata'];
-    expect(headersValid(validHeaders)).toBe(true);
+    const validRow = {
+      article: 'test',
+      authorName: 'john smith',
+      metadata: '{clicks: 200}',
+    };
+    expect(headersValid(validRow)).toBe(true);
   });
 
   it('should return false for incorrect headers', () => {
-    const invalidHeaders = ['article', 'author', 'metadata'];
-    expect(headersValid(invalidHeaders)).toBe(false);
+    const invalidRow = {
+      article: 'test',
+      author: 'john smith',
+      metadata: '{clicks: 200}',
+    };
+    expect(headersValid(invalidRow)).toBe(false);
   });
 
   it('should return false for unordered headers', () => {
-    const invalidHeaders = ['authorName', 'article', 'metadata'];
-    expect(headersValid(invalidHeaders)).toBe(false);
+    const invalidRow = {
+      authorName: 'john smith',
+      article: 'test',
+      metadata: '{clicks: 200}',
+    };
+    expect(headersValid(invalidRow)).toBe(false);
   });
 
   it('should return false for too many headers', () => {
-    const invalidHeaders = ['article', 'authorName', 'metadata', 'test'];
-    expect(headersValid(invalidHeaders)).toBe(false);
+    const invalidRow = {
+      article: 'test',
+      authorName: 'john smith',
+      metadata: '{clicks: 200}',
+      tooMany: 'test2',
+    };
+    expect(headersValid(invalidRow)).toBe(false);
   });
 });
