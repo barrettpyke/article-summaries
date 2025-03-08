@@ -9,7 +9,10 @@ export async function POST(request: NextRequest) {
 
     for (const row of rows) {
       const { article } = row;
-      const prompt = `You are a data processor, using the article starting after BEGIN and up to END craft a summary that is detailed and thorough, while maintaining clarity and conciseness. Rely strictly on the provided text, without including external information. Format the summary in one or two sentences for easy understanding. Using the same article determine the sentiment of the text which can be positive, neutral, or negative. Also using the same article determine the theme, for example if the article discusses a specific industry use that, if the article is about a specific sport use that. The response should be a JSON object with the summary, sentiment, and theme.
+      const prompt = `You are a data processor, using the article starting after BEGIN and up to END craft a summary that is detailed and thorough, while maintaining clarity and conciseness. Rely strictly on the provided text, without including external information. Format the summary in one or two sentences for easy understanding. 
+      Using the same article determine the sentiment of the text which can only be positive, neutral, or negative. If you cannot determine the sentiment you should choose neutral. 
+      Also using the same article determine the theme, for example if the article discusses a specific industry use that, if the article is about a specific sport use that. The theme should be a single word that best encompasses the articles subject matter. 
+      The response should be a JSON object with the summary, sentiment, and theme.
       
       BEGIN
       ${article}
@@ -18,7 +21,7 @@ export async function POST(request: NextRequest) {
       const result = await geminiModel.generateContent(prompt);
       const obj = result.response.text();
       console.log(obj);
-      responseData.push(JSON.parse(obj));
+      // responseData.push(obj);
     }
 
     return NextResponse.json(responseData, { status: 200 });
