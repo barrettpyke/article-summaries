@@ -3,11 +3,11 @@
 import { DragEvent, Ref, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { headersValid } from './headersValid';
-import { Row } from '@/types';
+import { InputRow } from '@/types';
 import LoadingSpinner from '../LoadingSpinner';
 
 interface ExcelFileInputProps {
-  onFileUpload: (json: Row[]) => void;
+  onFileUpload: (json: InputRow[]) => void;
 }
 
 const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
@@ -69,7 +69,7 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
       const workbook = XLSX.read(data, { type: 'array' });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const jsonData: Row[] = XLSX.utils.sheet_to_json(worksheet);
+      const jsonData: InputRow[] = XLSX.utils.sheet_to_json(worksheet);
       console.log(jsonData);
 
       if (!headersValid(jsonData[0])) {

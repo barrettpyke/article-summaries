@@ -1,17 +1,21 @@
 'use client';
 
 import ExcelFileInput from '@/components/ExcelFileInput/ExcelFileInput';
-import { Row } from '@/types';
+import { InputRow } from '@/types';
 
 export default function Home() {
-  const onFileUpload = async (file: Row[]) => {
+  const onFileUpload = async (file: InputRow[]) => {
     try {
       const response = await fetch('api/summarize-file', {
         method: 'POST',
         body: JSON.stringify(file),
       });
 
-      return response.json();
+      if (response.status >= 200 && response.status <= 299) {
+        return response.json();
+      } else {
+        throw new Error(`Response status: ${response.status}`);
+      }
     } catch (err) {
       throw new Error(`${err}`);
     }
