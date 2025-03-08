@@ -41,6 +41,10 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
     } else {
       setError('File upload failed.');
     }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Reset the input value
+    }
   };
 
   const onClick = () => {
@@ -71,12 +75,13 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const jsonData: InputRow[] = XLSX.utils.sheet_to_json(worksheet);
-      console.log(jsonData);
 
       if (!headersValid(jsonData[0])) {
         setError(
           'Invalid headers, please set the following headers in the first row, in this order: article, authorName, metadata',
         );
+        setIsLoading(false);
+        return;
       }
 
       if (onFileUpload) {
