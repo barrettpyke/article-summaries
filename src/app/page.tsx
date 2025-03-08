@@ -31,7 +31,11 @@ export default function Home() {
       </div>
       <div>
         Once the file is processed a spreadsheet will be returned with the additional
-        columns: summary, sentiment
+        columns: summary, tags <br /> <br />
+        <div className="ml-10">
+          The tags will display the sentiment (positive, neutral, negative) and the theme
+          of the article.
+        </div>
       </div>
       <ExcelFileInput onFileUpload={onFileUpload} />
     </div>

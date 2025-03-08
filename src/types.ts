@@ -9,5 +9,7 @@ export type OutputRow = {
   authorName: string;
   metadata: string;
   summary: string;
-  sentiment: string;
+  tags: { sentiment: Sentiment; theme: string };
 };
+
+export type Sentiment = 'positive' | 'neutral' | 'negative';
