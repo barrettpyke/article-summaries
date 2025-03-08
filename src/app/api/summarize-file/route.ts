@@ -1,3 +1,4 @@
+import { parseJson } from '@/helpers/parseJson';
 import { geminiModel } from '@/server/services/geminiModel';
 import { OutputRow } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
@@ -9,19 +10,30 @@ export async function POST(request: NextRequest) {
 
     for (const row of rows) {
       const { article } = row;
-      const prompt = `You are a data processor, using the article starting after BEGIN and up to END craft a summary that is detailed and thorough, while maintaining clarity and conciseness. Rely strictly on the provided text, without including external information. Format the summary in one or two sentences for easy understanding. 
-      Using the same article determine the sentiment of the text which can only be positive, neutral, or negative. If you cannot determine the sentiment you should choose neutral. 
-      Also using the same article determine the theme, for example if the article discusses a specific industry use that, if the article is about a specific sport use that. The theme should be a single word that best encompasses the articles subject matter. 
-      The response should be a JSON object with the summary, sentiment, and theme.
-      
-      BEGIN
+      const prompt = `
+      Please analyze the following article and return a JSON object with the following keys:
+
+      * **summary**: A concise summary of the article's main points (maximum 3 sentences).
+      * **sentiment**: The overall sentiment of the article, categorized as "positive", "negative", or "neutral".
+      * **theme**: A brief description of the article's primary subject matter or theme (e.g., "technology", "politics", "sports", "finance", "health", "entertainment").
+
+      Here is the article:
+
       ${article}
-      END`;
+
+      Please return your response in the following JSON format:
+
+      {
+        "summary": "[Your summary here]",
+        "sentiment": "[positive/negative/neutral]",
+        "theme": "[Article theme here]"
+      }
+`;
 
       const result = await geminiModel.generateContent(prompt);
-      const obj = result.response.text();
-      console.log(obj);
-      // responseData.push(obj);
+      const text = result.response.text();
+      const obj = parseJson(text);
+      responseData.push({ ...row, ...obj });
     }
 
     return NextResponse.json(responseData, { status: 200 });

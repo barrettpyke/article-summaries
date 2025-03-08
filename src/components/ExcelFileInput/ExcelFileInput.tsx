@@ -3,11 +3,12 @@
 import { DragEvent, Ref, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { headersValid } from './headersValid';
-import { InputRow } from '@/types';
+import { InputRow, OutputRow } from '@/types';
 import LoadingSpinner from '../LoadingSpinner';
+import { saveAs } from 'file-saver';
 
 interface ExcelFileInputProps {
-  onFileUpload: (json: InputRow[]) => void;
+  onFileUpload: (json: InputRow[]) => Promise<OutputRow[]>;
 }
 
 const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
@@ -79,7 +80,13 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
       }
 
       if (onFileUpload) {
-        onFileUpload(jsonData);
+        const response: OutputRow[] = await onFileUpload(jsonData);
+        const worksheet = XLSX.utils.json_to_sheet(response);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+        saveAs(blob, `summary_output.xlsx`);
       }
     } catch (err) {
       setError(`Error processing file: ${err}`);
