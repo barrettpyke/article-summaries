@@ -16,3 +16,11 @@ export const headersValid = (row: object) => {
 
   return true;
 };
+
+export const isExcelFile = (selectedFile: File) => {
+  return (
+    selectedFile.type ===
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+    selectedFile.type === 'application/vnd.ms-excel'
+  );
+};

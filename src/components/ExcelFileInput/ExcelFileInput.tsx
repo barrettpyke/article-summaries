@@ -1,11 +1,11 @@
 'use client';
 
 import { DragEvent, Ref, useRef, useState } from 'react';
-import * as XLSX from 'xlsx';
-import { headersValid } from './headersValid';
+import { headersValid, isExcelFile } from './validation';
 import { InputRow, OutputRow } from '@/types';
 import LoadingSpinner from '../LoadingSpinner';
 import { saveAs } from 'file-saver';
+import { fileToJson, outputRowToBlob } from './excel';
 
 interface ExcelFileInputProps {
   onFileUpload: (json: InputRow[]) => Promise<OutputRow[]>;
@@ -55,11 +55,7 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
 
   const handleFile = (selectedFile: File) => {
     if (selectedFile) {
-      if (
-        selectedFile.type ===
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-        selectedFile.type === 'application/vnd.ms-excel'
-      ) {
+      if (isExcelFile(selectedFile)) {
         setIsLoading(true);
         processExcel(selectedFile);
       } else {
@@ -70,11 +66,7 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
 
   const processExcel = async (file: File) => {
     try {
-      const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const jsonData: InputRow[] = XLSX.utils.sheet_to_json(worksheet);
+      const jsonData = await fileToJson(file);
 
       if (!headersValid(jsonData[0])) {
         setError(
@@ -86,12 +78,7 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
 
       if (onFileUpload) {
         const response: OutputRow[] = await onFileUpload(jsonData);
-        console.log(response);
-        const worksheet = XLSX.utils.json_to_sheet(response);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+        const blob = outputRowToBlob(response);
         saveAs(blob, `summary_output.xlsx`);
       }
     } catch (err) {

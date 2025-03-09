@@ -1,4 +1,4 @@
-import { headersValid } from './headersValid';
+import { headersValid } from './validation';
 
 describe('headersValid', () => {
   it('should return true for valid headers', () => {
