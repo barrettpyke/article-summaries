@@ -1,3 +1,5 @@
+export const maxDuration = 60;
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { buildResponse } from '@/helpers/buildResponse';
 import { parseJson } from '@/helpers/parseJson';
