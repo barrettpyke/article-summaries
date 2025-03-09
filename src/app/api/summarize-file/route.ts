@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       Please analyze the following article and return a JSON object with the following keys:
 
       * **summary**: A concise summary of the article's main points (maximum 3 sentences).
-      * **sentiment**: The overall sentiment of the article, categorized as "positive", "negative", or "neutral".
+      * **sentiment**: An object containing the overall sentiment of the article, categorized as "positive", "negative", or "neutral", and a confidence score between 0 and 1 representing the certainty of the sentiment analysis.
       * **theme**: A brief description of the article's primary subject matter or theme (e.g., "technology", "politics", "sports", "finance", "health", "entertainment").
 
       Here is the article:
