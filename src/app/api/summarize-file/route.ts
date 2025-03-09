@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       }
 `;
 
-      const result = await geminiModel.generateContent(prompt);
+      const result = await geminiModel.generateContent(prompt, { timeout: 90_000 });
       const text = result.response.text();
       const obj = parseJson(text);
       const responseRow = buildResponse(obj, row);
