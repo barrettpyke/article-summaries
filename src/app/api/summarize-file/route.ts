@@ -1,12 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { buildResponse } from '@/helpers/buildResponse';
 import { parseJson } from '@/helpers/parseJson';
 import { geminiModel } from '@/server/services/geminiModel';
-import { OutputRow } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
+
+export type SummarizeFileResponse = {
+  article: string;
+  authorName: string;
+  metadata: string;
+  summary: string;
+  tags: string;
+};
 
 export async function POST(request: NextRequest) {
   try {
     const rows = await request.json();
-    const responseData: OutputRow[] = [];
+    const responseData: SummarizeFileResponse[] = [];
 
     for (const row of rows) {
       const { article } = row;
@@ -33,12 +42,13 @@ export async function POST(request: NextRequest) {
       const result = await geminiModel.generateContent(prompt);
       const text = result.response.text();
       const obj = parseJson(text);
-      responseData.push({ ...row, ...obj });
+      const responseRow = buildResponse(obj, row);
+
+      responseData.push(responseRow);
     }
 
     return NextResponse.json(responseData, { status: 200 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.statusText }, { status: error.status });
   }
 }

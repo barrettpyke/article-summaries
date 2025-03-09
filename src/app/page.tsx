@@ -5,19 +5,24 @@ import { InputRow, OutputRow } from '@/types';
 
 export default function Home() {
   const onFileUpload = async (file: InputRow[]): Promise<OutputRow[]> => {
-    try {
-      const response = await fetch('api/summarize-file', {
-        method: 'POST',
-        body: JSON.stringify(file),
-      });
+    const response = await fetch('api/summarize-file', {
+      method: 'POST',
+      body: JSON.stringify(file),
+    });
 
-      if (response.status >= 200 && response.status <= 299) {
-        return response.json();
-      } else {
-        throw new Error(`Response status: ${response.status}`);
+    if (response.status >= 200 && response.status <= 299) {
+      return response.json();
+    } else {
+      if (response.status === 429) {
+        throw new Error(
+          `Too many requests, limit the number of articles in the file to a maximum of 15.`,
+        );
+      } else if (response.status === 500) {
+        throw new Error(
+          `Your input is too long to return a summary. Please limit the articles to a word count of 30,000.`,
+        );
       }
-    } catch (err) {
-      throw new Error(`${err}`);
+      throw new Error('There was an error processing your request, please try again.');
     }
   };
 

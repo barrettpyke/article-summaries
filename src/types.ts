@@ -12,4 +12,4 @@ export type OutputRow = {
   tags: { sentiment: Sentiment; theme: string };
 };
 
-export type Sentiment = 'positive' | 'neutral' | 'negative';
+export type Sentiment = 'positive' | 'neutral' | 'negative' | 'unknown';

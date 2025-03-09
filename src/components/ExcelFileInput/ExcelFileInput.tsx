@@ -86,6 +86,7 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
 
       if (onFileUpload) {
         const response: OutputRow[] = await onFileUpload(jsonData);
+        console.log(response);
         const worksheet = XLSX.utils.json_to_sheet(response);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
@@ -94,7 +95,7 @@ const ExcelFileInput: React.FC<ExcelFileInputProps> = ({ onFileUpload }) => {
         saveAs(blob, `summary_output.xlsx`);
       }
     } catch (err) {
-      setError(`Error processing file: ${err}`);
+      setError(`${err}`);
     }
     setIsLoading(false);
   };
