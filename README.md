@@ -21,3 +21,5 @@ The api/summarize-file POST route leverages the gemini-1.5-flash model to build 
 2. Run `npm install` in the root directory
 3. Add a .env file with a `GEMINI_API_KEY` variable that contains a Gemini api key capable of using the gemini-1.5-flash model
 4. Run `npm run dev`
+
+There is test data located [here](./src/testing/test_data.xlsx)
